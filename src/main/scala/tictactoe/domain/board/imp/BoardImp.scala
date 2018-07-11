@@ -33,13 +33,14 @@ class BoardImp(val size: Int) extends Board{
     }
   }
 
-  private def isInField(pos: Pos): Boolean = {
-    pos.col >=0 && pos.col < size && pos.row >= 0 && pos.row < size
-  }
+  private def isInField(pos: Pos): Boolean =
+    pos.col >= 0 &&
+      pos.col < size &&
+      pos.row >= 0 &&
+      pos.row < size
 
-  private def isOccupied(pos: Pos): Boolean = {
-    board(pos.row)(pos.col) != 0
-  }
+
+  private def isOccupied(pos: Pos): Boolean = board(pos.row)(pos.col) != 0
 
   override def hasMarkLineThrough(pos: Pos): Boolean =
     rowMarkedThrough(pos) || columnMarkedThrough(pos) || diagonalMarkedThrough(pos)
