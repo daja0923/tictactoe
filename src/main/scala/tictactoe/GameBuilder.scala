@@ -11,26 +11,41 @@ import scala.util.Random
 class GameBuilder {
 
   def build(): Unit = {
-    val boardSize = GameConfig.getBoardSize
-    val game: EventSourcedGame = Game.initGameWithEvents(boardSize, 3)
-    val computerPlayer = ComputerPlayer(GameConfig.getComputerPlayerSymbol)
-    val humanPlayerOne = HumanPlayer(GameConfig.getHumanPlayer1Symbol)
-    val humanPlayerTwo = HumanPlayer(GameConfig.getHumanPlayer2Symbol)
+    val game: EventSourcedGame = buildGame()
 
     val gameUI = new GameConsole(game)
 
     game.addSubscriber(gameUI)
 
-    var players: List[Player] = List(computerPlayer, humanPlayerOne, humanPlayerTwo)
+    val players = buildPlayers()
 
+    joinPlayersToGameRandomly(game, players)
+
+  }
+
+  private def buildGame(): EventSourcedGame = {
+    val boardSize = GameConfig.getBoardSize
+    Game.initGameWithEvents(boardSize, 3)
+  }
+
+  private def buildPlayers(): List[Player] = {
+    val computerPlayer = ComputerPlayer(GameConfig.getComputerPlayerSymbol)
+    val humanPlayerOne = HumanPlayer(GameConfig.getHumanPlayer1Symbol)
+    val humanPlayerTwo = HumanPlayer(GameConfig.getHumanPlayer2Symbol)
+    List(computerPlayer, humanPlayerOne, humanPlayerTwo)
+  }
+
+  private def joinPlayersToGameRandomly(game: Game, players: List[Player]): Unit = {
     val random = Random
-    val first = players(random.nextInt(3))
-    players = players.filterNot(_.equals(first))
-    val second = players(random.nextInt(2))
-    players = players.filterNot(_.equals(second))
-    val third = players.head
-    gameUI.addPlayer(first)
-    gameUI.addPlayer(second)
-    gameUI.addPlayer(third)
+    var playersToJoin = players
+    val first = playersToJoin(random.nextInt(3))
+    playersToJoin = playersToJoin.filterNot(_.equals(first))
+    val second = playersToJoin(random.nextInt(2))
+    playersToJoin = playersToJoin.filterNot(_.equals(second))
+    val third = playersToJoin.head
+
+    first.join(game)
+    second.join(game)
+    third.join(game)
   }
 }
