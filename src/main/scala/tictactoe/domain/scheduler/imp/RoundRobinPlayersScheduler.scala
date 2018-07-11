@@ -11,30 +11,15 @@ class RoundRobinPlayersScheduler(numOfPlayers: Int) extends PlayersScheduler{
 
   private var _queue = mutable.Queue[Player]()
 
-  override def contains(player: Player): Boolean = {
-    _queue.contains(player)
-  }
+  override def contains(player: Player): Boolean = _queue.contains(player)
 
   override def size: Int = _queue.length
 
   override def isEmpty: Boolean = _queue.isEmpty
 
-  override def add(player:Player):Boolean = {
-    if(_queue.exists(_.equals(player)) || isFull){
-      false
-    }else{
-      _queue.enqueue(player)
-      _queue.last.equals(player)
-    }
-  }
+  override def isFull: Boolean = size >= numOfPlayers
 
-  override def remove(player:Player):Boolean = {
-    val exists = _queue.exists(_.equals(player))
-    if(exists){
-      _queue = _queue.filterNot(_.equals(player))
-    }
-    exists && !_queue.contains(player)
-  }
+  override def hasEnoughPlayers: Boolean = size >= numOfPlayers
 
   override def current: Option[Player] = if(hasEnoughPlayers) _queue.headOption else None
 
@@ -47,7 +32,20 @@ class RoundRobinPlayersScheduler(numOfPlayers: Int) extends PlayersScheduler{
     }
   }
 
-  override def isFull: Boolean = size >= numOfPlayers
+  override def add(player:Player):Boolean = {
+    if(_queue.exists(_.equals(player)) || isFull){
+      false
+    }else{
+      _queue.enqueue(player)
+      _queue.lastOption.exists(_.equals(player))
+    }
+  }
 
-  override def hasEnoughPlayers: Boolean = size >= numOfPlayers
+  override def remove(player:Player):Boolean = {
+    val exists = _queue.exists(_.equals(player))
+    if(exists){
+      _queue = _queue.filterNot(_.equals(player))
+    }
+    exists && !_queue.contains(player)
+  }
 }
