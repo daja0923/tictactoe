@@ -29,7 +29,7 @@ object Game{
     new EventSourcedGameImp(board, scheduler)
   }
 
-  def initGameWithState(boardSize: Int, numOfPlayers: Int): Game = {
+  def initDefaultGame(boardSize: Int, numOfPlayers: Int): Game = {
     val board = Board.defaultImp(boardSize)
     val scheduler = new RoundRobinPlayersScheduler(numOfPlayers)
     new DefaultGameImp(board, scheduler)
