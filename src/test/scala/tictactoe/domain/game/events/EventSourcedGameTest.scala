@@ -11,101 +11,90 @@ import tictactoe.ui.player.imp.ComputerPlayer
 
 class EventSourcedGameTest extends FunSuite with Matchers with MockFactory{
 
-  test("New game cannot be played without players"){
+  private val playerA = getPlayer('A')
+  private val playerB = getPlayer('B')
+  private val playerC = getPlayer('C')
+
+  test("New game cannot be played without joined players"){
     val game = Game.initGameWithEvents(3,2)
     intercept[GameHasNotStarted]{
-      game.makeMove(getPlayer('A'), Pos(0,0))
+      playerA.move(game, Pos(0,0))
     }
-    game.addPlayer(getPlayer('A'))
   }
 
   test("Game cannot be played with too few players"){
     val game = Game.initGameWithEvents(3,2)
-    game.addPlayer(getPlayer('A'))
+    playerA.join(game)
     intercept[GameHasNotStarted]{
-      game.makeMove(getPlayer('A'), Pos(0,0))
+      playerA.move(game, Pos(0,0))
     }
   }
 
-  test("Game cannot be played with no joined player"){
+  test("Game cannot be played with a player that has not joined"){
     val game = Game.initGameWithEvents(3,2)
-    game.addPlayer(getPlayer('A'))
-    game.addPlayer(getPlayer('B'))
+    playerA.join(game)
+    playerB.join(game)
 
     intercept[PlayerNotMember]{
-      game.makeMove(getPlayer('C'), Pos(0,0))
+      playerC.move(game, Pos(0,0))
     }
   }
 
-  test("Cannot add more player than number of players"){
+  test("Cannot add more player than defined number of players"){
     val game = Game.initGameWithEvents(3,2)
-    game.addPlayer(getPlayer('A'))
-    game.addPlayer(getPlayer('B'))
+    playerA.join(game)
+    playerB.join(game)
 
     intercept[PlayersPositionsAlreadyFilled]{
-      game.addPlayer(getPlayer('C'))
+      playerC.join(game)
     }
   }
 
   test("Game rejects player's move out of its turn"){
     val game = Game.initGameWithEvents(3,2)
-    game.addPlayer(getPlayer('A'))
-    game.addPlayer(getPlayer('B'))
+    playerA.join(game)
+    playerB.join(game)
 
     intercept[WrongPlayersTurn]{
-      game.makeMove(getPlayer('B'), Pos(0,0))
+      playerB.move(game, Pos(0,0))
     }
   }
 
   test("Cannot make move outside board"){
     val game = Game.initGameWithEvents(3,2)
-    game.addPlayer(getPlayer('A'))
-    game.addPlayer(getPlayer('B'))
+    playerA.join(game)
+    playerB.join(game)
 
     intercept[InvalidBoardPosition]{
-      game.makeMove(getPlayer('A'), Pos(0,3))
+      playerA.move(game, Pos(0,3))
     }
   }
 
   test("Cannot make move on already marked position"){
     val game = Game.initGameWithEvents(3,2)
-    game.addPlayer(getPlayer('A'))
-    game.addPlayer(getPlayer('B'))
-    game.makeMove(getPlayer('A'), Pos(0,0))
-
-    intercept[PositionAlreadyMarked]{
-      game.makeMove(getPlayer('B'), Pos(0,0))
-    }
-  }
-
-  test("Cannot add player when Game is over"){
-    val game = Game.initGameWithEvents(3,2)
-    val playerA = getPlayer('A')
-    val playerB = getPlayer('B')
     playerA.join(game)
     playerB.join(game)
-    game.makeMove(playerA, Pos(0,0))
-    game.makeMove(playerB, Pos(1,0))
-    game.makeMove(playerA, Pos(0,1))
+    playerA.move(game, Pos(0,0))
 
-    game.makeMove(playerB, Pos(1,1))
-    game.makeMove(playerA, Pos(0,2))
-
-    intercept[GameAlreadyOver]{
-      game.makeMove(playerB, Pos(2,2))
+    intercept[PositionAlreadyMarked]{
+      playerB.move(game, Pos(0,0))
     }
   }
 
-  test("notify on PlayerJoined and PlayerLeft events"){
+  test("Cannot play when Game is over"){
     val game = Game.initGameWithEvents(3,2)
-    val playerA = getPlayer('A')
-
-    val mockSubscriber = mock[EventSubscriber]
-    game.addSubscriber(mockSubscriber)
-    (mockSubscriber.onPlayerJoined(_: Game, _: Player)).expects(game, playerA)
     playerA.join(game)
-    (mockSubscriber.onPlayerLeft(_: Game, _: Player)).expects(game, playerA)
-    playerA.leave(game)
+    playerB.join(game)
+    playerA.move(game, Pos(0,0))
+    playerB.move(game, Pos(1,0))
+    playerA.move(game, Pos(0,1))
+
+    playerB.move(game,  Pos(1,1))
+    playerA.move(game, Pos(0,2))
+
+    intercept[GameAlreadyOver]{
+      playerC.move(game, Pos(2,2))
+    }
   }
 
   def getPlayer(id: PlayerSymbol): Player = ComputerPlayer(id)
