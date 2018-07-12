@@ -98,7 +98,7 @@ class PlayersSchedulerTest extends FunSpec with Matchers with BeforeAndAfterAll{
           queue.size shouldBe 3
         }
 
-        it("should not have enough players"){
+        it("should have enough players"){
           queue.hasEnoughPlayers shouldBe true
         }
 
