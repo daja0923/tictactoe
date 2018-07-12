@@ -27,13 +27,4 @@ case class ComputerPlayer(id: PlayerSymbol) extends Player{
     }
     Pos(0,0)
   }
-
-  override def equals(obj: scala.Any): Boolean = {
-    obj match {
-      case other: ComputerPlayer =>
-        other.id == id
-      case _ => false
-    }
-  }
-
 }
