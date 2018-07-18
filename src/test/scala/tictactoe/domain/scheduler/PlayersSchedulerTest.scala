@@ -16,6 +16,20 @@ class PlayersSchedulerTest extends FunSpec with Matchers with BeforeAndAfterAll{
     queue = new RoundRobinPlayersScheduler(3)
   }
 
+  describe("Cannot create scheduler with size smaller than 2"){
+    it("cannot create with size 1"){
+      intercept[AssertionError]{
+        new RoundRobinPlayersScheduler(1)
+      }
+    }
+
+    it("cannot create with size 0"){
+      intercept[AssertionError]{
+        new RoundRobinPlayersScheduler(0)
+      }
+    }
+  }
+
   describe("A scheduler with size 8"){
 
     describe("When created"){
