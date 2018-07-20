@@ -15,6 +15,7 @@ class BoardTest extends FunSuite with Matchers{
     val board = Board.defaultImp(3)
     for(i <- 0 until 3){
       for(j <- 0 until 3){
+        board.isEmpty shouldBe true
         board.hasMarkLineThrough(Pos(i, j)) shouldBe false
       }
     }
@@ -27,6 +28,7 @@ class BoardTest extends FunSuite with Matchers{
       board.mark(Pos(2, 1), 'X')
     }
   }
+
 
   test("board cannot have size less than 3 and more than 10"){
     intercept[AssertionError]{
@@ -87,6 +89,17 @@ class BoardTest extends FunSuite with Matchers{
       }
     }
     board.isFull shouldBe true
+  }
+
+
+  test("win by marking corners"){
+    val board = Board.defaultImp(4)
+    board.mark(Pos(0,0), 'X') shouldBe false
+    //board.hasMarkLineThrough()
+    board.mark(Pos(0,3), 'X') shouldBe false
+    board.mark(Pos(3,0), 'X') shouldBe false
+    board.mark(Pos(3,3), 'X') shouldBe true
+
   }
 
 }

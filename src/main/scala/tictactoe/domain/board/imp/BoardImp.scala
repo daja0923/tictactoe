@@ -43,7 +43,7 @@ class BoardImp(val size: Int) extends Board{
   private def isOccupied(pos: Pos): Boolean = board(pos.row)(pos.col) != 0
 
   override def hasMarkLineThrough(pos: Pos): Boolean =
-    rowMarkedThrough(pos) || columnMarkedThrough(pos) || diagonalMarkedThrough(pos)
+    rowMarkedThrough(pos) || columnMarkedThrough(pos) || diagonalMarkedThrough(pos) || cornersMarked(pos)
 
   private def rowMarkedThrough(pos: Pos): Boolean = {
     val ch = board(pos.row)(pos.col)
@@ -63,5 +63,28 @@ class BoardImp(val size: Int) extends Board{
     ch != 0 &&
       (range.forall{i => board(i)(i) == ch} && range.exists(i => pos equals Pos(i, i)) ||
         range.forall{j => board(j)(size - 1 - j) == ch} && range.exists(j => pos equals Pos(j, size - 1 - j)))
+  }
+
+  private def cornersMarked(pos: Pos): Boolean = {
+    val mark = getMark(pos)
+
+    mark match {
+      case None => false
+      case Some(m) =>
+        val corners = List(Pos(0, 0), Pos(0, size - 1), Pos(size - 1, 0), Pos(size - 1, size -1))
+        corners.contains(pos) &&
+          corners.forall{pos =>
+            getMark(pos).contains(m)
+          }
+    }
+  }
+
+  private def getMark(pos: Pos): Option[PlayerSymbol] = {
+    if(pos.row >= size || pos.col >= size)
+      None
+    else if(board(pos.row)(pos.col) == 0)
+      None
+    else
+      Some(board(pos.row)(pos.col))
   }
 }
